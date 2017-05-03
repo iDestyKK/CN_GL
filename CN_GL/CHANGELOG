@@ -1,0 +1,8 @@
+CN_GL (Clara Nguyen's GL Wrapper) CHANGELOG
+
+This changelog is organised so that the oldest changes are last and the newest
+changes are at the top. Be aware that not all changes may be obvious when shown
+here.
+
+Version 0.0.1 (2017/05/02):
+  - Started CN_GL

@@ -1,0 +1,117 @@
+/*
+ * CN_GL - Model Object
+ *
+ * Description:
+ *     Initialises an object type to hold information about a 3D model.
+ *     This makes it easier to manage 3D models later on in CN_GL.
+ * 
+ * Author:
+ *     Clara Van Nguyen
+ */
+
+//Constructor
+function CN_GL_MODEL() {
+	//Generic information
+	this.model_path = "";
+	this.ready = false;
+	this.x = 0;
+	this.y = 0;
+	this.z = 0;
+
+	//Stores all information about the model
+	this.vertex  = Array();
+	this.normal  = Array();
+	this.texture = Array();
+	
+	//Actual information for drawing the model (Face information)
+	this.vertex_id  = Array();
+	this.normal_id  = Array();
+	this.texture_id = Array();
+
+	//Extra data
+	this.tri_normal = Array();
+	this.temp_tri_normal = Array();
+	this.ver_normal = Array();
+}
+
+CN_GL_MODEL.prototype.load_from_obj = function(filepath) {
+	//Load information from an OBJ file and put it in the model
+	this.model_path = filepath;
+	var obj = this;
+	$.ajax({
+		url: filepath,
+		success: function (data) {
+			parse_obj(obj, data);
+		}
+	});
+}
+
+function parse_obj(obj, data) {
+	/*
+	 * OBJ Importer based on class driver code
+	 *
+	 * Assumes that CN_GL_MODEL's "load_from_obj" function worked.
+	 * DO NOT call this function yourself.
+	 */
+	
+	var lines = data.split('\n');
+	for (var i = 0; i < lines.length; i++) {
+		//Remove double spaces
+		lines[i] = lines[i].replace(/\s{2,}/g, " ");
+
+		if (lines[i].startsWith('v ')) {
+			//This is a vertex point
+			var line = lines[i].slice(2).split(" ");
+			obj.vertex.push(line[0], line[1], line[2]);
+		}
+		else if (lines[i].startsWith('vn')) {
+			//This is a vertex normal
+			var line = lines[i].slice(3).split(" ");
+			obj.normal.push(line[0], line[1], line[2]);
+		}
+		else if (lines[i].startsWith('vt')) {
+			//This is a vertex texture
+			var line = lines[i].slice(3).split(" ");
+			obj.texture.push(line[0], line[1]);
+		}
+		else if (lines[i].startsWith('f ')) {
+			//This is a face
+			var line = lines[i].slice(2).split(" ");
+			for (var j = 1; j <= line.length - 2; j++) {
+				//Push vertex indices
+				obj.vertex_id.push(
+					line[0    ].split('/')[0] - 1,
+					line[j    ].split('/')[0] - 1,
+					line[j + 1].split('/')[0] - 1
+				);
+
+				//Push texture indices
+				obj.texture_id.push(
+					line[0    ].split('/')[1] - 1,
+					line[j    ].split('/')[1] - 1,
+					line[j + 1].split('/')[1] - 1
+				);
+
+				//Push normal indices
+				obj.normal_id.push(
+					line[0    ].split('/')[2] - 1,
+					line[j    ].split('/')[2] - 1,
+					line[j + 1].split('/')[2] - 1
+				);
+			}
+		}
+	}
+
+	//Post-Processing Effects
+	if (obj.normal.length == 0) {
+		//This model has no defined normals!
+		
+		//Clear out this array since it probably contains garbage (a lot of "NaN"s)
+		normal_id = Array();
+
+		//Now for the REAL deal...
+		for (var i = 0; i < obj.vertex.length; i++) {
+			
+		}
+	}
+}
