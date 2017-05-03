@@ -36,6 +36,7 @@
 			"http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js",
 
 			//CN_GL Dependencies
+			"CN_GL/js/cn_gl.js",
 			"CN_GL/js/model_obj.js",
 			"CN_GL/js/instance.js"
 		);
