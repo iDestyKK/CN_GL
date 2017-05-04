@@ -1,5 +1,5 @@
 <!--
- * CN_GL Demo - Quake Map Demonstration
+ * CN_GL Demo - Triangle Example
  *
  * Description:
  *     This library was developed by me to aide in this final project. It uses
@@ -44,39 +44,13 @@
 		gl.attachShader(CN_TRIANGLE_SHADER_PROGRAM, cn_gl_get_shader("CN_TRIANGLE_VERTEX"));
 		gl.linkProgram(CN_TRIANGLE_SHADER_PROGRAM);
 
-		fS = cn_gl_get_shader("FragmentShader1");
-		vS = cn_gl_get_shader("VertexShader1");
-		shaderProgram = gl.createProgram();
-		gl.attachShader(shaderProgram, vS);
-		gl.attachShader(shaderProgram, fS);
-		gl.linkProgram(shaderProgram);
-
-		//gl.useProgram(shaderProgram);
-
-		if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+		if (!gl.getProgramParameter(CN_TRIANGLE_SHADER_PROGRAM, gl.LINK_STATUS)) {
 			console.log("Unable to init shader program");
 		}
-
-		//Create Triangles
-		tri1 = new CN_TRIANGLE(-0.5, 0.5, 0, 0.5, 0.5, 0, 0, -0.5, 0, make_color_rgb(255, 0, 0), make_color_rgb(255, 0, 255), make_color_rgb(255, 255, 0));
-		tri2 = new CN_TRIANGLE(-0.5, yy, 0, 0.5, yy, 0, 0, yy - 1, 0, make_color_rgb(255, 0, 0), make_color_rgb(255, 0, 255), make_color_rgb(255, 255, 0));
-		tri1.init(-0.5, 0.5, 0, 0.5, 0.5, 0, 0, -0.5, 0, make_color_rgb(255, 0, 0), make_color_rgb(255, 0, 255), make_color_rgb(255, 255, 0));
-		tri2.init(-0.5, 0.5, 0, 0.5, 0.5, 0, 0, -0.5, 0, make_color_rgb(255, 0, 0), make_color_rgb(255, 0, 255), make_color_rgb(255, 255, 0));
 
 		//Create a camera
 		camera = new CN_CAMERA();
 		camera.set_projection_ext(2, 2, 2, 0, 0, 0, 0, 1, 0, 75, gl.canvas.clientWidth / gl.canvas.clientHeight, 0.1, 4096.0);
-
-		//Load a cube model
-		cube_model = new CN_MODEL();
-		cube_model.load_from_obj("model/obj/cube.obj");
-
-		//Create a cube instance
-		cube_object = new CN_INSTANCE();
-		cube_object.set_model(cube_model);
-		cube_object.set_texture("texture/tex_ut.png");
-		cube_object.set_program(shaderProgram);
-		object_list.push(cube_object);
 
 		//Start the draw event.
 		draw();
@@ -89,8 +63,22 @@
 		angle += 0.1;
 		camera.push_matrix_to_shader(CN_TRIANGLE_SHADER_PROGRAM, "uPMatrix", "uMVMatrix");
 
-		draw_triangle(-0.5, 0.5, 0, 0.5, 0.5, 0, 0, -0.5, 0, make_color_rgb(255, 0, 0), make_color_rgb(255, 0, 255), make_color_rgb(255, 255, 0));
-		draw_triangle(-0.5, yy, 0, 0.5, yy, 0, 0, yy - 1, 0, make_color_rgb(255, 0, 0), make_color_rgb(255, 0, 255), make_color_rgb(255, 255, 0));
+		draw_triangle(
+			-0.5,  0.5, 0,
+			 0.5,  0.5, 0,
+			 0  , -0.5, 0, 
+			make_color_rgb(255, 0, 0), 
+			make_color_rgb(255, 0, 255),
+			make_color_rgb(255, 255, 0)
+		);
+		draw_triangle(
+			-0.5, yy    , 0,
+			 0.5, yy    , 0,
+			 0  , yy - 1, 0,
+			make_color_rgb(255, 0, 0),
+			make_color_rgb(255, 0, 255),
+			make_color_rgb(255, 255, 0)
+		);
 
 		//Draw the floor
 		draw_triangle(-1, -1, -1, 1, -1, -1, 1, -1, 1,
@@ -124,10 +112,6 @@
 		<?php
 			//Setup our 3D view
 			cn_gl_create_canvas("glCanvas", "1280", "720");
-
-			//Behold our shaders
-			cn_gl_load_fragment_shader("FragmentShader1", "shader/SimpleFragmentShader.frag");
-			cn_gl_load_vertex_shader("VertexShader1", "shader/SimpleVertexShader.vert");
 
 			//CN Generic Shaders for "draw_shapes"
 			cn_gl_load_fragment_shader("CN_TRIANGLE_FRAGMENT", "shader/CN_SHAPES/triangle.frag");

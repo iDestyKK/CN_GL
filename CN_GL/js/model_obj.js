@@ -10,7 +10,7 @@
  */
 
 //Constructor
-function CN_GL_MODEL() {
+function CN_MODEL() {
 	//Generic information
 	this.model_path = "";
 	this.ready = false;
@@ -30,26 +30,33 @@ function CN_GL_MODEL() {
 	this.ver_normal           = Array();
 
 	//Buffers
+	this.vertex_buffer        = Array();
 	this.vertex_normal_buffer = Array();
+	this.texture_buffer       = Array();
 }
 
-CN_GL_MODEL.prototype.load_from_obj = function(filepath) {
+CN_MODEL.prototype.load_from_obj = function(filepath) {
 	//Load information from an OBJ file and put it in the model
 	this.model_path = filepath;
 	var obj = this;
 	$.ajax({
-		url: filepath,
+		url    : filepath,
+		async  : false,
 		success: function (data) {
 			parse_obj(obj, data);
 		}
 	});
+
+	//Disregard the fact it's async. We proceed after it loads.
+	//...and cause an infinite loop while we're at it. Ugh.
+	//while (!this.ready) {}
 }
 
 function parse_obj(obj, data) {
 	/*
 	 * OBJ Importer based on class driver code
 	 *
-	 * Assumes that CN_GL_MODEL's "load_from_obj" function worked.
+	 * Assumes that CN_MODEL's "load_from_obj" function worked.
 	 * DO NOT call this function yourself.
 	 */
 	
@@ -115,8 +122,6 @@ function parse_obj(obj, data) {
 		obj.ver_normal [i] = { x: 0, y: 0, z: 0 };
 	}
 
-	console.log(obj.vertex_id.length);
-	
 	for (var i = 0; i < obj.vertex_id.length / 3; i++) {
 		//if (obj.normal.length == 0) {
 			obj.tri_normal[i] = cn_gl_calculate_normal(
@@ -159,6 +164,16 @@ function parse_obj(obj, data) {
 		obj.ver_normal[i].z /= m;
 	}
 
+	//Create the vertex buffer
+	obj.vertex_buffer = Array();
+	for (var i = 0; i < obj.vertex_id.length; i++) {
+		obj.vertex_buffer.push(
+			parseFloat(obj.vertex[obj.vertex_id[i] * 3]    ),
+			parseFloat(obj.vertex[obj.vertex_id[i] * 3] + 1),
+			parseFloat(obj.vertex[obj.vertex_id[i] * 3] + 2)
+		);
+	}
+
 	//Create the vertex normal buffer
 	obj.vertex_normal_buffer = Array();
 	for (var i = 0; i < obj.ver_normal.length; i++) {
@@ -168,6 +183,18 @@ function parse_obj(obj, data) {
 			obj.ver_normal[i].z
 		);
 	}
+
+	//Create the texture buffer.
+	obj.texture_buffer = Array();
+	for (var i = 0; i < obj.texture_id.length; i++) {
+		obj.texture_buffer.push(
+			obj.texture[ obj.texture_id[i] * 2     ],
+			obj.texture[(obj.texture_id[i] * 2) + 1],
+		);
+	}
+	
+	//This model is ready to be displayed.
+	obj.ready = true;
 }
 
 function cn_gl_calculate_normal(modelID, a, b, c) {

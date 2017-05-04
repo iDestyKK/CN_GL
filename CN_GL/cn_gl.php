@@ -35,10 +35,15 @@
 			//jQuery... because we are apparently forced to use it.
 			"http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js",
 
+			//Other libraries
+			"CN_GL/js/sylvester.js",
+
 			//CN_GL Dependencies
 			"CN_GL/js/cn_gl.js",
 			"CN_GL/js/model_obj.js",
-			"CN_GL/js/instance.js"
+			"CN_GL/js/instance.js",
+			"CN_GL/js/camera.js",
+			"CN_GL/js/draw_shapes.js"
 		);
 
 		//Loop through and add all of them in.

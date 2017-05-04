@@ -12,10 +12,10 @@
 
 function cn_gl_init_gl(canvas_id, init_function) {
 	var canvas = document.getElementById(canvas_id);
-	
+
 	//Set to webgl for browsers that officially support it.
 	gl = canvas.getContext("webgl");
-	
+
 	if (!gl) {
 		//Stubborn web browser. Resort to experimental.
 		console.log("WebGL not supported. Resorting to experimental-webgl");
@@ -26,7 +26,7 @@ function cn_gl_init_gl(canvas_id, init_function) {
 		//Get a better browser please. :)
 		console.log("Your browser doesn't support webgl or experimental-webgl.");
 	}
-	
+
 	//Set the viewport.
 	gl.viewport(0, 0, canvas.width, canvas.height);
 
@@ -34,4 +34,43 @@ function cn_gl_init_gl(canvas_id, init_function) {
 	if (init_function) {
 		init_function(); //Yes
 	}
+}
+
+function cn_gl_get_shader(id) {
+	var shaderScript, theSource, currentChild, shader;
+
+	shaderScript = document.getElementById(id);
+	if(!shaderScript){
+		return null;
+	}
+
+	theSource = "";
+
+	currentChild = shaderScript.firstChild;
+
+	while(currentChild){
+		if(currentChild.nodeType == currentChild.TEXT_NODE){
+			theSource += currentChild.textContent;
+		}
+		currentChild = currentChild.nextSibling;
+	}
+
+	if(shaderScript.type == "x-shader/x-fragment"){
+		shader = gl.createShader(gl.FRAGMENT_SHADER);
+	} else if(shaderScript.type == "x-shader/x-vertex"){
+		shader = gl.createShader(gl.VERTEX_SHADER);
+	} else {
+		return null;
+	}
+
+	gl.shaderSource(shader, theSource);
+
+	gl.compileShader(shader);
+
+	if(!gl.getShaderParameter(shader, gl.COMPILE_STATUS)){
+		console.log("error compiling shaders -- " + gl.getShaderInfoLog(shader));
+		return null;
+	}
+
+	return shader;
 }
