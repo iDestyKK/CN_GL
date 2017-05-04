@@ -59,8 +59,16 @@
 	function draw() {
 		gl.clear(gl.CLEAR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		
-		camera.set_projection_ext(Math.cos(angle) * 2, 2, -Math.sin(angle) * 2, 0, 0, 0, 0, 1, 0, 75, gl.canvas.clientWidth / gl.canvas.clientHeight, 0.1, 4096.0);
-		angle += 0.1;
+		camera.set_projection_ext(
+			Math.cos(angle) * 2, 2, -Math.sin(angle) * 2,   //Camera position
+			0, 0, 0,                                        //Point to look at
+			0, 1, 0,                                        //Up Vector (always this)
+			75,                                             //FOV
+			gl.canvas.clientWidth / gl.canvas.clientHeight, //Aspect Ratio
+			0.1,                                            //Closest distance
+			4096.0                                          //Farthest distance
+		);
+		angle += 0.01;
 		camera.push_matrix_to_shader(CN_TRIANGLE_SHADER_PROGRAM, "uPMatrix", "uMVMatrix");
 
 		draw_triangle(
