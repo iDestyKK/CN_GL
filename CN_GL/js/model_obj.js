@@ -168,9 +168,9 @@ function parse_obj(obj, data) {
 	obj.vertex_buffer = Array();
 	for (var i = 0; i < obj.vertex_id.length; i++) {
 		obj.vertex_buffer.push(
-			parseFloat(obj.vertex[obj.vertex_id[i] * 3]    ),
-			parseFloat(obj.vertex[obj.vertex_id[i] * 3] + 1),
-			parseFloat(obj.vertex[obj.vertex_id[i] * 3] + 2)
+			parseFloat(obj.vertex[(obj.vertex_id[i] * 3)    ]),
+			parseFloat(obj.vertex[(obj.vertex_id[i] * 3) + 1]),
+			parseFloat(obj.vertex[(obj.vertex_id[i] * 3) + 2])
 		);
 	}
 

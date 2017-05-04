@@ -92,10 +92,9 @@ CN_INSTANCE.prototype.set_texture = function(texturePath) {
 }
 
 CN_INSTANCE.prototype.draw = function() {
-	if (this.model != undefined) {
+	if (this.model != undefined && this.model.ready == true) {
 		//Draw only if the instance has a model
 
-		
 		//Create vertex buffer
 		var vertex_buffer = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
@@ -109,7 +108,7 @@ CN_INSTANCE.prototype.draw = function() {
 			3,
 			gl.FLOAT,
 			gl.FALSE,
-			3 * Float32Array.BYTES_PER_ELEMENT,
+			0,
 			0
 		);
 		gl.enableVertexAttribArray(ver_pos_attr);
