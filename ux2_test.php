@@ -82,62 +82,39 @@
 	}
 
 	function draw() {
+		//Clear the screen
 		gl.clear(gl.CLEAR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-		
+
+		//Project the camera
 		camera.set_projection_ext(
-			Math.cos(angle) * 512, -Math.sin(angle) * 512, 128, //Camera position
-			0, 0, 0,                                           //Point to look at
-			0, 0, 1,                                           //Up Vector (always this)
-			75,                                                //FOV
-			gl.canvas.clientWidth / gl.canvas.clientHeight,    //Aspect Ratio
-			1.0,                                               //Closest distance
-			4096.0                                             //Farthest distance
+			Math.cos(angle) * 512, -Math.sin(angle) * 512, 184, //Camera position
+			0, 0, -128,                                         //Point to look at
+			0, 0,    1,                                         //Up Vector (always this)
+			75,                                                 //FOV
+			gl.canvas.clientWidth / gl.canvas.clientHeight,     //Aspect Ratio
+			1.0,                                                //Closest distance
+			4096.0                                              //Farthest distance
 		);
 		angle += 0.01;
-		//camera.push_matrix_to_shader(CN_TRIANGLE_SHADER_PROGRAM, "uPMatrix", "uMVMatrix");
-
-		gl.useProgram(CN_TRIANGLE_SHADER_PROGRAM);
-		camera.push_matrix_to_shader(CN_TRIANGLE_SHADER_PROGRAM, "uPMatrix", "uMVMatrix");
-
-		draw_triangle(
-			-0.5,  0.5, 0,
-			 0.5,  0.5, 0,
-			 0  , -0.5, 0, 
-			make_color_rgb(255, 0, 0), 
-			make_color_rgb(255, 0, 255),
-			make_color_rgb(255, 255, 0)
-		);
-		draw_triangle(
-			-0.5, yy    , 0,
-			 0.5, yy    , 0,
-			 0  , yy - 1, 0,
-			make_color_rgb(255, 0, 0),
-			make_color_rgb(255, 0, 255),
-			make_color_rgb(255, 255, 0)
-		);
-
-		//Draw the floor
-		draw_triangle(-1, -1, -1, 1, -1, -1, 1, -1, 1,
-			make_color_rgb(127, 127, 127),
-			make_color_rgb(127, 127, 127),
-			make_color_rgb(127, 127, 127)
-		);
-		draw_triangle(1, -1, 1, -1, -1, 1, -1, -1, -1,
-			make_color_rgb(127, 127, 127),
-			make_color_rgb(127, 127, 127),
-			make_color_rgb(127, 127, 127)
-		);
 		
-		gl.useProgram(CN_TEXTURE_SIMPLE_SHADER_PROGRAM);
-		camera.push_matrix_to_shader(CN_TEXTURE_SIMPLE_SHADER_PROGRAM, "uPMatrix", "uMVMatrix");
+		//Draw every object
+		var prev_program = null;
+		for (var i = 0; i < object_list.length; i++) {
+			//Only change shader program if the object uses a different shader program.
+			if (prev_program != object_list[i].program) {
+				gl.useProgram(object_list[i].program);
+				camera.push_matrix_to_shader(
+					object_list[i].program,
+					"uPMatrix",
+					"uMVMatrix"
+				);
+			}
 
-		for (var i = 0; i < object_list.length; i++)
+			//Draw the object
 			object_list[i].draw();
-
-		yy += 0.1;
-		if (yy > 1)
-			yy = 0;
-
+		}
+		
+		//Request from the browser to draw again
 		window.requestAnimationFrame(draw);
 	}
 </script>
