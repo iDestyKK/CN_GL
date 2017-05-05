@@ -57,7 +57,7 @@
 
 	//Functions to deal with setting up 3D
 	function cn_gl_create_canvas($id, $width, $height) {
-		echo '<canvas id = "'.$id.'" width = "'.$width.'" height = "'.$height.'">';
+		echo '<canvas id = "'.$id.'" style = "width:'.$width.';height:'.$height.';">';
 		echo PHP_EOL;
 		echo '	Your browser doesn\'t support the "canvas" element.' . PHP_EOL;
 		echo '</canvas>' . PHP_EOL;
