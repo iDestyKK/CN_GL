@@ -202,7 +202,7 @@ function parse_obj(obj, data) {
 	for (var i = 0; i < obj.texture_id.length; i++) {
 		obj.texture_buffer.push(
 			obj.texture[ obj.texture_id[i] * 2     ],
-			obj.texture[(obj.texture_id[i] * 2) + 1],
+			obj.texture[(obj.texture_id[i] * 2) + 1]
 		);
 	}
 	
