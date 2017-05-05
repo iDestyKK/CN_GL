@@ -1,5 +1,5 @@
 <!--
- * CN_GL Demo - Triangle Example
+ * CN_GL Demo - UX2 Map Example
  *
  * Description:
  *     This library was developed by me to aide in this final project. It uses
@@ -24,10 +24,10 @@
 ?>
 
 <script type = "text/javascript">
-	var gl, camera, cube_model;
+	var gl, camera;
 	var object_list  = [];
+	var model_list   = {};
 	var texture_list = {};
-
 	var CN_TRIANGLE_SHADER_PROGRAM, CN_TRIANGLE_NO_COLOUR_SHADER_PROGRAM;
 	var yy = 0;
 	var angle = 0;
@@ -51,54 +51,31 @@
 			cn_gl_get_shader("CN_TEXTURE_SIMPLE_VERTEX")
 		);
 
-		//Create a texture
-		var texture = new CN_TEXTURE("texture/tex_ut.png");
-		texture_list["UT_TEX"] = texture;
-
 		//Create a camera
 		camera = new CN_CAMERA();
-		camera.set_projection_ext(4, 2, 4, 0, 0, 0, 0, 1, 0, 75, gl.canvas.clientWidth / gl.canvas.clientHeight, 0.1, 256.0);
+
+		//Load a texture
+		var texture = new CN_TEXTURE("texture/077.gif");
+		texture_list["GROUND_TEX"] = texture;
 		
 		//Load the block model
-		cube_model = new CN_MODEL();
+		var cube_model = new CN_MODEL();
 		cube_model.load_from_obj("model/obj/cube.obj");
+		model_list["CUBE"] = cube_model;
 		
-		//Create 4 block objects that use this model
-		//East
-		var cube_object = new CN_INSTANCE(
-			2, 0, 0,
-			cube_model,
-			texture_list["UT_TEX"],
-			CN_TEXTURE_SIMPLE_SHADER_PROGRAM
-		);
-		object_list.push(cube_object);
-		
-		//West
-		cube_object = new CN_INSTANCE(
-			-2, 0, 0,
-			cube_model,
-			texture_list["UT_TEX"],
-			CN_TEXTURE_SIMPLE_SHADER_PROGRAM
-		);
-		object_list.push(cube_object);
-		
-		//South
-		cube_object = new CN_INSTANCE(
-			0, 0, -2,
-			cube_model,
-			texture_list["UT_TEX"],
-			CN_TEXTURE_SIMPLE_SHADER_PROGRAM
-		);
-		object_list.push(cube_object);
+		//Load the base of the level as a model
+		var ground_model = new CN_MODEL();
+		ground_model.load_from_obj("model/obj/gl_map_ground.obj");
+		model_list["LEVEL_GROUND"] = ground_model;
 
-		//North
-		cube_object = new CN_INSTANCE(
-			0, 0, 2,
-			cube_model,
-			texture_list["UT_TEX"],
+		//Create the map object
+		var map_object = new CN_INSTANCE(
+			0, 0, 0,
+			model_list["LEVEL_GROUND"],
+			texture_list["GROUND_TEX"],
 			CN_TEXTURE_SIMPLE_SHADER_PROGRAM
 		);
-		object_list.push(cube_object);
+		object_list.push(map_object);
 
 		//Start the draw event.
 		draw();
@@ -108,13 +85,13 @@
 		gl.clear(gl.CLEAR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		
 		camera.set_projection_ext(
-			Math.cos(angle) * 4, 2, -Math.sin(angle) * 4,   //Camera position
-			0, 0, 0,                                        //Point to look at
-			0, 1, 0,                                        //Up Vector (always this)
-			75,                                             //FOV
-			gl.canvas.clientWidth / gl.canvas.clientHeight, //Aspect Ratio
-			1.0,                                            //Closest distance
-			256.0                                          //Farthest distance
+			Math.cos(angle) * 512, -Math.sin(angle) * 512, 128, //Camera position
+			0, 0, 0,                                           //Point to look at
+			0, 0, 1,                                           //Up Vector (always this)
+			75,                                                //FOV
+			gl.canvas.clientWidth / gl.canvas.clientHeight,    //Aspect Ratio
+			1.0,                                               //Closest distance
+			4096.0                                             //Farthest distance
 		);
 		angle += 0.01;
 		//camera.push_matrix_to_shader(CN_TRIANGLE_SHADER_PROGRAM, "uPMatrix", "uMVMatrix");

@@ -39,14 +39,10 @@
 		gl.depthFunc(gl.LEQUAL);
 
 		//Create shader programs
-		CN_TRIANGLE_SHADER_PROGRAM = gl.createProgram();
-		gl.attachShader(CN_TRIANGLE_SHADER_PROGRAM, cn_gl_get_shader("CN_TRIANGLE_FRAGMENT"));
-		gl.attachShader(CN_TRIANGLE_SHADER_PROGRAM, cn_gl_get_shader("CN_TRIANGLE_VERTEX"));
-		gl.linkProgram(CN_TRIANGLE_SHADER_PROGRAM);
-
-		if (!gl.getProgramParameter(CN_TRIANGLE_SHADER_PROGRAM, gl.LINK_STATUS)) {
-			console.log("Unable to init shader program");
-		}
+		CN_TRIANGLE_SHADER_PROGRAM = cn_gl_create_shader_program(
+			cn_gl_get_shader("CN_TRIANGLE_FRAGMENT"),
+			cn_gl_get_shader("CN_TRIANGLE_VERTEX")
+		);
 
 		//Create a camera
 		camera = new CN_CAMERA();

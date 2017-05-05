@@ -32,8 +32,28 @@ function CN_INSTANCE() {
 
 	//Texture Information
 	this.texture = null;
-	this.texture_image = null;
-	this.texture_path = "";
+}
+
+function CN_INSTANCE(_x, _y, _z, _model, _texture, _program) {
+	//Coordinate Information
+	this.x          = _x;
+	this.y          = _y;
+	this.z          = _z;
+	this.start_x    = _x;
+	this.start_y    = _y;
+	this.start_z    = _z;
+	this.previous_x = _x;
+	this.previous_y = _y;
+	this.previous_z = _z;
+
+	//Model Information
+	this.model = _model;
+	
+	//Shader Information
+	this.program = _program;
+
+	//Texture Information
+	this.texture = _texture;
 }
 
 CN_INSTANCE.prototype.init = function(_x, _y, _z) {
@@ -66,7 +86,11 @@ CN_INSTANCE.prototype.set_program = function(programID) {
 	this.program = programID;
 }
 
-CN_INSTANCE.prototype.set_texture = function(texturePath) {
+CN_INSTANCE.prototype.set_texture = function(_texture) {
+	this.texture = _texture;
+}
+
+/*CN_INSTANCE.prototype.set_texture = function(texturePath) {
 	this.texture_path = texturePath;
 	
 	//Set up the basic texture
@@ -105,7 +129,7 @@ CN_INSTANCE.prototype.set_texture = function(texturePath) {
 		);
 		gl.generateMipmap(gl.TEXTURE_2D);
 	});
-}
+}*/
 
 CN_INSTANCE.prototype.draw = function() {
 	if (this.model != undefined && this.model.ready == true) {
@@ -130,32 +154,34 @@ CN_INSTANCE.prototype.draw = function() {
 		gl.enableVertexAttribArray(ver_pos_attr);
 
 		//Deal with textures
-		if (this.texture_type == "CUBE_MAP") {
-			//You're getting fancy...
-		} else {
-			//Standard Texture
-			var texture_loc = gl.getUniformLocation(this.program, "texture");
-			
-			gl.activeTexture(gl.TEXTURE0);
-			gl.bindTexture(gl.TEXTURE_2D, this.texture);
-			gl.uniform1i(texture_loc, 0);
+		if (this.texture != null) {
+			if (this.texture.texture_type == "CUBE_MAP") {
+				//You're getting fancy...
+			} else {
+				//Standard Texture
+				var texture_loc = gl.getUniformLocation(this.program, "texture");
+				
+				gl.activeTexture(gl.TEXTURE0);
+				gl.bindTexture(gl.TEXTURE_2D, this.texture.texture);
+				gl.uniform1i(texture_loc, 0);
 
-			var texture_buffer = gl.createBuffer();
-			gl.bindBuffer(gl.ARRAY_BUFFER, texture_buffer);
-			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.model.texture_buffer), gl.STATIC_DRAW);
+				var texture_buffer = gl.createBuffer();
+				gl.bindBuffer(gl.ARRAY_BUFFER, texture_buffer);
+				gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.model.texture_buffer), gl.STATIC_DRAW);
 
-			var tex_pos_attr = gl.getAttribLocation(this.program, "texcoord");
+				var tex_pos_attr = gl.getAttribLocation(this.program, "texcoord");
 
-			gl.bindBuffer(gl.ARRAY_BUFFER, texture_buffer);
-			gl.vertexAttribPointer(
-				tex_pos_attr,
-				2,
-				gl.FLOAT,
-				gl.FALSE,
-				0,
-				0
-			);
-			gl.enableVertexAttribArray(tex_pos_attr);
+				gl.bindBuffer(gl.ARRAY_BUFFER, texture_buffer);
+				gl.vertexAttribPointer(
+					tex_pos_attr,
+					2,
+					gl.FLOAT,
+					gl.FALSE,
+					0,
+					0
+				);
+				gl.enableVertexAttribArray(tex_pos_attr);
+			}
 		}
 
 		//Deal with transformations
