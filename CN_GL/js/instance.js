@@ -24,6 +24,14 @@ function CN_INSTANCE() {
 	this.previous_y = 0;
 	this.previous_z = 0;
 
+	//Attributes
+	this.xscale = 1;
+	this.yscale = 1;
+	this.zscale = 1;
+	this.xrot = 0;
+	this.yrot = 0;
+	this.zrot = 0;
+
 	//Model Information
 	this.model = null;
 	
@@ -46,6 +54,14 @@ function CN_INSTANCE(_x, _y, _z, _model, _texture, _program) {
 	this.previous_y = _y;
 	this.previous_z = _z;
 
+	//Attributes
+	this.xscale = 1;
+	this.yscale = 1;
+	this.zscale = 1;
+	this.xrot = 0;
+	this.yrot = 0;
+	this.zrot = 0;
+
 	//Model Information
 	this.model = _model;
 	
@@ -67,6 +83,24 @@ CN_INSTANCE.prototype.init = function(_x, _y, _z) {
 	this.previous_y = _y;
 	this.previous_z = _z;
 }
+
+//Scale Functions
+CN_INSTANCE.prototype.set_scale = function(_x, _y, _z) {
+	this.xscale = _x;
+	this.yscale = _y;
+	this.zscale = _z;
+}
+
+//TODO: Add X Y Z only scale functions
+
+//Rotation Functions
+CN_INSTANCE.prototype.set_rotation = function(_x, _y, _z) {
+	this.xrot = _x;
+	this.yrot = _y;
+	this.zrot = _z;
+}
+
+//TODO: Add X Y Z only rotation functions
 
 CN_INSTANCE.prototype.set_position = function(_x, _y, _z) {
 	this.previous_x = this.x;
@@ -189,6 +223,15 @@ CN_INSTANCE.prototype.draw = function() {
 		if (transform_loc != -1) {
 			//The shader "must" support transformations to do them!
 			gl.uniform3fv(transform_loc, new Float32Array([this.x, this.y, this.z]));
+		}
+		
+		//Deal with scaling
+		var scale_loc = gl.getUniformLocation(this.program, "scale");
+		if (scale_loc != -1) {
+			//The shader "must" support scaling to do them!
+			gl.uniform3fv(scale_loc, new Float32Array([
+				this.xscale, this.yscale, this.zscale
+			]));
 		}
 
 		//gl.bindBuffer(gl.ARRAY_BUFFER, texture_buffer);

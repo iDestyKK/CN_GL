@@ -10,7 +10,7 @@
  */
 
 //Constructor
-function CN_MODEL() {
+function CN_MODEL(filepath) {
 	//Generic information
 	this.model_path = "";
 	this.ready = false;
@@ -33,6 +33,19 @@ function CN_MODEL() {
 	this.vertex_buffer        = Array();
 	this.vertex_normal_buffer = Array();
 	this.texture_buffer       = Array();
+
+	if (filepath != undefined) {
+		//Load information from an OBJ file and put it in the model
+		this.model_path = filepath;
+		var obj = this;
+		$.ajax({
+			url    : filepath,
+			async  : false,
+			success: function (data) {
+				parse_obj(obj, data);
+			}
+		});
+	}
 }
 
 CN_MODEL.prototype.load_from_obj = function(filepath) {

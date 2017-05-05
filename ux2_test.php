@@ -28,7 +28,7 @@
 	var object_list  = [];
 	var model_list   = {};
 	var texture_list = {};
-	var CN_TRIANGLE_SHADER_PROGRAM, CN_TRIANGLE_NO_COLOUR_SHADER_PROGRAM;
+	var program_list = {};
 	var yy = 0;
 	var angle = 0;
 
@@ -41,12 +41,12 @@
 		gl.depthFunc(gl.LESS);
 
 		//Create shader programs
-		CN_TRIANGLE_SHADER_PROGRAM = cn_gl_create_shader_program(
+		program_list["CN_TRIANGLE_SHADER_PROGRAM"] = cn_gl_create_shader_program(
 			cn_gl_get_shader("CN_TRIANGLE_FRAGMENT"),
 			cn_gl_get_shader("CN_TRIANGLE_VERTEX")
 		);
 		
-		CN_TEXTURE_SIMPLE_SHADER_PROGRAM = cn_gl_create_shader_program(
+		program_list["CN_TEXTURE_SIMPLE_SHADER_PROGRAM"] = cn_gl_create_shader_program(
 			cn_gl_get_shader("CN_TEXTURE_SIMPLE_FRAGMENT"),
 			cn_gl_get_shader("CN_TEXTURE_SIMPLE_VERTEX")
 		);
@@ -54,28 +54,48 @@
 		//Create a camera
 		camera = new CN_CAMERA();
 
-		//Load a texture
-		var texture = new CN_TEXTURE("texture/077.gif");
-		texture_list["GROUND_TEX"] = texture;
-		
-		//Load the block model
-		var cube_model = new CN_MODEL();
-		cube_model.load_from_obj("model/obj/cube.obj");
-		model_list["CUBE"] = cube_model;
+		//Load map textures
+		texture_list["GROUND_TEX"] = new CN_TEXTURE("texture/077.gif");
+		texture_list["BOTTOM_TEX"] = new CN_TEXTURE("texture/185.gif");
+
+		//Load railgun texture
+		texture_list["TEX_RAILGUN"] = new CN_TEXTURE("texture/Railgun_Tex.gif");
 		
 		//Load the base of the level as a model
-		var ground_model = new CN_MODEL();
-		ground_model.load_from_obj("model/obj/gl_map_ground.obj");
-		model_list["LEVEL_GROUND"] = ground_model;
+		model_list["LEVEL_GROUND"] = new CN_MODEL("model/obj/gl_map_ground.obj");
 
-		//Create the map object
+		//Load the bottom of the level as a model
+		model_list["LEVEL_BOTTOM"] = new CN_MODEL("model/obj/gl_map_bottom.obj");
+
+		//Load railgun model
+		model_list["MDL_RAILGUN"] = new CN_MODEL("model/obj/rail.obj");
+
+		//Create the map ground object
 		var map_object = new CN_INSTANCE(
 			0, 0, 0,
 			model_list["LEVEL_GROUND"],
 			texture_list["GROUND_TEX"],
-			CN_TEXTURE_SIMPLE_SHADER_PROGRAM
+			program_list["CN_TEXTURE_SIMPLE_SHADER_PROGRAM"]
 		);
 		object_list.push(map_object);
+
+		//Create the map bottom object
+		var map_object = new CN_INSTANCE(
+			0, 0, -128,
+			model_list["LEVEL_BOTTOM"],
+			texture_list["BOTTOM_TEX"],
+			program_list["CN_TEXTURE_SIMPLE_SHADER_PROGRAM"]
+		);
+		object_list.push(map_object);
+
+		//Create the railgun object
+		object_list.push(new CN_INSTANCE(
+			0, 0, 16,
+			model_list["MDL_RAILGUN"],
+			texture_list["TEX_RAILGUN"],
+			program_list["CN_TEXTURE_SIMPLE_SHADER_PROGRAM"]	
+		));
+		object_list[object_list.length - 1].set_scale(8, 8, 8);
 
 		//Start the draw event.
 		draw();
