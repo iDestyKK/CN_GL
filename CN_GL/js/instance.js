@@ -14,12 +14,15 @@
 
 function CN_INSTANCE() {
 	//Coordinate Information
-	this.x = 0;
-	this.y = 0;
-	this.z = 0;
-	this.start_x = 0;
-	this.start_y = 0;
-	this.start_z = 0;
+	this.x          = 0;
+	this.y          = 0;
+	this.z          = 0;
+	this.start_x    = 0;
+	this.start_y    = 0;
+	this.start_z    = 0;
+	this.previous_x = 0;
+	this.previous_y = 0;
+	this.previous_z = 0;
 
 	//Model Information
 	this.model = null;
@@ -34,12 +37,25 @@ function CN_INSTANCE() {
 }
 
 CN_INSTANCE.prototype.init = function(_x, _y, _z) {
+	this.x          = _x;
+	this.y          = _y;
+	this.z          = _z;
+	this.start_x    = _x;
+	this.start_y    = _y;
+	this.start_z    = _z;
+	this.previous_x = _x;
+	this.previous_y = _y;
+	this.previous_z = _z;
+}
+
+CN_INSTANCE.prototype.set_position = function(_x, _y, _z) {
+	this.previous_x = this.x;
+	this.previous_y = this.y;
+	this.previous_z = this.z;
+
 	this.x = _x;
 	this.y = _y;
 	this.z = _z;
-	this.start_x = _x;
-	this.start_y = _y;
-	this.start_z = _z;
 }
 
 CN_INSTANCE.prototype.set_model = function(modelOBJ) {
@@ -112,6 +128,42 @@ CN_INSTANCE.prototype.draw = function() {
 			0
 		);
 		gl.enableVertexAttribArray(ver_pos_attr);
+
+		//Deal with textures
+		if (this.texture_type == "CUBE_MAP") {
+			//You're getting fancy...
+		} else {
+			//Standard Texture
+			var texture_loc = gl.getUniformLocation(this.program, "texture");
+			
+			gl.activeTexture(gl.TEXTURE0);
+			gl.bindTexture(gl.TEXTURE_2D, this.texture);
+			gl.uniform1i(texture_loc, 0);
+
+			var texture_buffer = gl.createBuffer();
+			gl.bindBuffer(gl.ARRAY_BUFFER, texture_buffer);
+			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.model.texture_buffer), gl.STATIC_DRAW);
+
+			var tex_pos_attr = gl.getAttribLocation(this.program, "texcoord");
+
+			gl.bindBuffer(gl.ARRAY_BUFFER, texture_buffer);
+			gl.vertexAttribPointer(
+				tex_pos_attr,
+				2,
+				gl.FLOAT,
+				gl.FALSE,
+				0,
+				0
+			);
+			gl.enableVertexAttribArray(tex_pos_attr);
+		}
+
+		//Deal with transformations
+		var transform_loc = gl.getUniformLocation(this.program, "transform");
+		if (transform_loc != -1) {
+			//The shader "must" support transformations to do them!
+			gl.uniform3fv(transform_loc, new Float32Array([this.x, this.y, this.z]));
+		}
 
 		//gl.bindBuffer(gl.ARRAY_BUFFER, texture_buffer);
 		//gl.vertexAttribPointer(tex_coord_attr, 2, gl.FLOAT, false, 0, 0);

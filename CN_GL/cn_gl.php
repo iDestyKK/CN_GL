@@ -40,6 +40,7 @@
 
 			//CN_GL Dependencies
 			"CN_GL/js/cn_gl.js",
+			"CN_GL/js/shader.js",
 			"CN_GL/js/model_obj.js",
 			"CN_GL/js/instance.js",
 			"CN_GL/js/camera.js",
