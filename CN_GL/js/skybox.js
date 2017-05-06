@@ -57,7 +57,7 @@ CN_CUBE_SKYBOX.prototype.draw = function() {
 			this.obj_array[i].set_position(
 				this.camera.pos[0],
 				this.camera.pos[1],
-				this.camera.pos[2],
+				this.camera.pos[2]
 			);
 		}
 	}
