@@ -1,17 +1,26 @@
-precision mediump float;
+precision mediump float;	
+attribute vec3 vec_pos; //vertex position
+varying vec3 vector_pos;
+varying vec3 c_pos;
+varying vec4 norm;
+varying mat4 matrix_MV;
+varying mat4 matrix_P;
+varying vec3 v_translate;
 
-attribute vec3 vec_pos;
-attribute vec2 texcoord;
+attribute vec3 normal;
+uniform vec3 camera_pos;
+uniform mat4 uMVMatrix;//modelviewmatrix
+uniform mat4 uPMatrix;//projectionmatrix
 
-uniform mat4 uMVMatrix;
-uniform mat4 uPMatrix;
 uniform vec3 transform;
 uniform vec3 scale;
 uniform vec3 rotate;
 
-varying vec2 v_texcoord;
+void main(void) {
+	norm = vec4(normal, 1.0);
+	c_pos = camera_pos;
+	v_translate = transform;
 
-void main() {
 	//Scale if possible
 	vec3 vec_real = vec3(
 		vec_pos.x * scale.x,
@@ -46,10 +55,17 @@ void main() {
 		0.0, 0.0, 0.0, 1.0
 	);
 	vec_real = vec3(vec4(vec_real, 1.0) * rotX * rotY * rotZ);
+	norm = norm * rotX * rotY * rotZ;
 
 	//Transform if possible
 	vec_real += transform;
-	v_texcoord = texcoord;
+
+	//Pass on to fragment shader
+	vector_pos = vec_real;
+
+	//Yes
+	matrix_MV = uMVMatrix;
+	matrix_P  = uPMatrix;
 
 	gl_Position = uPMatrix * uMVMatrix * vec4(vec_real, 1.0);
 }

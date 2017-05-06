@@ -95,9 +95,9 @@ CN_INSTANCE.prototype.set_scale = function(_x, _y, _z) {
 
 //Rotation Functions
 CN_INSTANCE.prototype.set_rotation = function(_x, _y, _z) {
-	this.xrot = _x;
-	this.yrot = _y;
-	this.zrot = _z;
+	this.xrot = _x / 180 * Math.PI;
+	this.yrot = _y / 180 * Math.PI;
+	this.zrot = _z / 180 * Math.PI;
 }
 
 //TODO: Add X Y Z only rotation functions
@@ -169,14 +169,10 @@ CN_INSTANCE.prototype.draw = function() {
 	if (this.model != undefined && this.model.ready == true) {
 		//Draw only if the instance has a model
 
-		//Create vertex buffer
-		var vertex_buffer = gl.createBuffer();
-		gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.model.vertex_buffer), gl.STATIC_DRAW);
-		
+		//Deal with textures
 		var ver_pos_attr = gl.getAttribLocation(this.program, "vec_pos");
 
-		gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.model.vertex_buffer);
 		gl.vertexAttribPointer(
 			ver_pos_attr,
 			3,
@@ -187,6 +183,26 @@ CN_INSTANCE.prototype.draw = function() {
 		);
 		gl.enableVertexAttribArray(ver_pos_attr);
 
+		//Deal with normals
+		var norm_pos_attr = gl.getAttribLocation(this.program, "normal");
+		if (norm_pos_attr != -1) {
+			//This shader supports normals. Let's push the normal buffer onto it.
+			gl.bindBuffer(gl.ARRAY_BUFFER, this.model.vertex_normal_buffer);
+			gl.vertexAttribPointer(
+				norm_pos_attr,
+				3,
+				gl.FLOAT,
+				gl.FALSE,
+				0,
+				0
+			);
+			gl.enableVertexAttribArray(norm_pos_attr);
+		}
+
+		//There's a chance that this will also deal with camera coordinates...
+		var camera_loc = gl.getUniformLocation(this.program, "camera_pos");
+		gl.uniform3fv(camera_loc, camera.pos);
+
 		//Deal with textures
 		if (this.texture != null) {
 			if (this.texture.texture_type == "CUBE_MAP") {
@@ -195,26 +211,24 @@ CN_INSTANCE.prototype.draw = function() {
 				//Standard Texture
 				var texture_loc = gl.getUniformLocation(this.program, "texture");
 				
-				gl.activeTexture(gl.TEXTURE0);
-				gl.bindTexture(gl.TEXTURE_2D, this.texture.texture);
-				gl.uniform1i(texture_loc, 0);
+				if (texture_loc != -1) {
+					gl.activeTexture(gl.TEXTURE0);
+					gl.bindTexture(gl.TEXTURE_2D, this.texture.texture);
+					gl.uniform1i(texture_loc, 0);
 
-				var texture_buffer = gl.createBuffer();
-				gl.bindBuffer(gl.ARRAY_BUFFER, texture_buffer);
-				gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.model.texture_buffer), gl.STATIC_DRAW);
+					var tex_pos_attr = gl.getAttribLocation(this.program, "texcoord");
 
-				var tex_pos_attr = gl.getAttribLocation(this.program, "texcoord");
-
-				gl.bindBuffer(gl.ARRAY_BUFFER, texture_buffer);
-				gl.vertexAttribPointer(
-					tex_pos_attr,
-					2,
-					gl.FLOAT,
-					gl.FALSE,
-					0,
-					0
-				);
-				gl.enableVertexAttribArray(tex_pos_attr);
+					gl.bindBuffer(gl.ARRAY_BUFFER, this.model.texture_buffer);
+					gl.vertexAttribPointer(
+						tex_pos_attr,
+						2,
+						gl.FLOAT,
+						gl.FALSE,
+						0,
+						0
+					);
+					gl.enableVertexAttribArray(tex_pos_attr);
+				}
 			}
 		}
 
@@ -231,6 +245,15 @@ CN_INSTANCE.prototype.draw = function() {
 			//The shader "must" support scaling to do them!
 			gl.uniform3fv(scale_loc, new Float32Array([
 				this.xscale, this.yscale, this.zscale
+			]));
+		}
+
+		//Deal with rotating
+		var rotate_loc = gl.getUniformLocation(this.program, "rotate");
+		if (rotate_loc != -1) {
+			//The shader "must" support rotating to do them!
+			gl.uniform3fv(rotate_loc, new Float32Array([
+				this.xrot, this.yrot, this.zrot
 			]));
 		}
 

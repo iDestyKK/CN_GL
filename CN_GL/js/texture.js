@@ -24,6 +24,10 @@ function CN_TEXTURE(image_path) {
 		this.load_from_image(image_path);
 }
 
+CN_TEXTURE.prototype.load_from_existing = function(tex) {
+	this.texture = tex;
+}
+
 CN_TEXTURE.prototype.load_from_image = function(image_path) {
 	this.texture_path = image_path;
 	

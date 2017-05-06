@@ -1,5 +1,5 @@
 <!--
- * CN_GL Demo - UX2 Map Example
+ * CN_GL Demo - Phong Example
  *
  * Description:
  *     This library was developed by me to aide in this final project. It uses
@@ -51,6 +51,11 @@
 			cn_gl_get_shader("CN_TEXTURE_SIMPLE_VERTEX")
 		);
 
+		program_list["CN_PHONG_NO_TEXTURE_SHADER_PROGRAM"] = cn_gl_create_shader_program(
+			cn_gl_get_shader("CN_PHONG_NO_TEXTURE_FRAGMENT"),
+			cn_gl_get_shader("CN_PHONG_NO_TEXTURE_VERTEX")
+		);
+
 		//Create a camera
 		camera = new CN_CAMERA();
 
@@ -68,7 +73,7 @@
 		model_list["LEVEL_BOTTOM"] = new CN_MODEL("model/obj/gl_map_bottom.obj");
 
 		//Load railgun model
-		model_list["MDL_RAILGUN"] = new CN_MODEL("model/obj/rail.obj");
+		model_list["MDL_TEAPOT"] = new CN_MODEL("model/obj/teapot.obj");
 
 		//Create the map ground object
 		object_list.push(new CN_INSTANCE(
@@ -86,14 +91,45 @@
 			program_list["CN_TEXTURE_SIMPLE_SHADER_PROGRAM"]
 		));
 
-		//Create the railgun object
+		//Create the north teapot object
 		object_list.push(new CN_INSTANCE(
-			0, 0, 16,
-			model_list["MDL_RAILGUN"],
-			texture_list["TEX_RAILGUN"],
-			program_list["CN_TEXTURE_SIMPLE_SHADER_PROGRAM"]	
+			0, -64, 0,
+			model_list["MDL_TEAPOT"],
+			null,
+			program_list["CN_PHONG_NO_TEXTURE_SHADER_PROGRAM"]	
 		));
-		object_list[object_list.length - 1].set_scale(8, 8, 8);
+		object_list[object_list.length - 1].set_scale(16, 16, 16);
+		object_list[object_list.length - 1].set_rotation(90, 0, -90);
+
+		//Create the south teapot object
+		object_list.push(new CN_INSTANCE(
+			0, 64, 0,
+			model_list["MDL_TEAPOT"],
+			null,
+			program_list["CN_PHONG_NO_TEXTURE_SHADER_PROGRAM"]	
+		));
+		object_list[object_list.length - 1].set_scale(16, 16, 16);
+		object_list[object_list.length - 1].set_rotation(90, 0, 90);
+
+		//Create the west teapot object
+		object_list.push(new CN_INSTANCE(
+			-64, 0, 0,
+			model_list["MDL_TEAPOT"],
+			null,
+			program_list["CN_PHONG_NO_TEXTURE_SHADER_PROGRAM"]	
+		));
+		object_list[object_list.length - 1].set_scale(16, 16, 16);
+		object_list[object_list.length - 1].set_rotation(90, 0, 180);
+
+		//Create the east teapot object
+		object_list.push(new CN_INSTANCE(
+			64, 0, 0,
+			model_list["MDL_TEAPOT"],
+			null,
+			program_list["CN_PHONG_NO_TEXTURE_SHADER_PROGRAM"]	
+		));
+		object_list[object_list.length - 1].set_scale(16, 16, 16);
+		object_list[object_list.length - 1].set_rotation(90, 0, 0);
 
 		//Start the draw event.
 		draw();
@@ -108,8 +144,8 @@
 
 		//Project the camera
 		camera.set_projection_ext(
-			Math.cos(angle) * 512, -Math.sin(angle) * 512, 184, //Camera position
-			0, 0, -128,                                         //Point to look at
+			Math.cos(angle) * 512/2, -Math.sin(angle) * 512/2, 184/2, //Camera position
+			0, 0, -184/4,                                         //Point to look at
 			0, 0,    1,                                         //Up Vector (always this)
 			75,                                                 //FOV
 			gl.canvas.clientWidth / gl.canvas.clientHeight,     //Aspect Ratio
@@ -117,6 +153,7 @@
 			4096.0                                              //Farthest distance
 		);
 		angle += 0.01;
+		//angle = 30 / 180 * Math.PI;
 		
 		//Draw every object
 		var prev_program = null;

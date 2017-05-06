@@ -53,6 +53,9 @@
 	}
 
 	function draw() {
+		resize(gl.canvas);
+		gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
 		gl.clear(gl.CLEAR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		
 		camera.set_projection_ext(
@@ -102,6 +105,18 @@
 
 		window.requestAnimationFrame(draw);
 	}
+
+	//Resize function to make sure that the canvas is the same size as the page.
+	function resize(canvasID) {
+		var retina = window.devicePixelRatio;
+		if (retina / 2 > 1) {
+			//Some devices may not be able to take drawing high resolution
+			//Half the retina if it can be halved, but it can't go under 1x.
+			retina /= 2;
+		}
+		canvasID.width  = canvasID.clientWidth  * retina;
+		canvasID.height = canvasID.clientHeight * retina;
+	}
 </script>
 
 <html>
@@ -112,10 +127,15 @@
 			cn_gl_inject_js();
 		?>
 	</head>
+	<style type = "text/css">
+		html, body {
+			margin: 0px;
+		}
+	</style>
 	<body onload = "cn_gl_init_gl('glCanvas', init)">
 		<?php
 			//Setup our 3D view
-			cn_gl_create_canvas("glCanvas", "1280", "720");
+			cn_gl_create_canvas("glCanvas", "100vw", "100vh");
 
 			//CN Generic Shaders for "draw_shapes"
 			cn_gl_load_fragment_shader("CN_TRIANGLE_FRAGMENT", "shader/CN_SHAPES/triangle.frag");

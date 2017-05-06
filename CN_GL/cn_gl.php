@@ -41,6 +41,7 @@
 			//CN_GL Dependencies
 			"CN_GL/js/cn_gl.js",
 			"CN_GL/js/shader.js",
+			"CN_GL/js/skybox.js",
 			"CN_GL/js/texture.js",
 			"CN_GL/js/model_obj.js",
 			"CN_GL/js/instance.js",

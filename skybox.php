@@ -1,5 +1,5 @@
 <!--
- * CN_GL Demo - UX2 Map Example
+ * CN_GL Demo - UX2 Skybox Example
  *
  * Description:
  *     This library was developed by me to aide in this final project. It uses
@@ -31,13 +31,16 @@
 	var program_list = {};
 	var yy = 0;
 	var angle = 0;
+	var SKYBOX_OBJ;
 
 	//Declare CN_GL Init Function that is called whenever the "body" element is loaded.
 	function init() {
 		//Basic WebGL Properties
 		gl.clearColor(0.0, 0.0, 0.0, 1);
 		gl.clearDepth(1.0);
+		gl.cullFace(gl.BACK);
 		gl.enable(gl.DEPTH_TEST);
+		gl.enable(gl.CULL_FACE);
 		gl.depthFunc(gl.LESS);
 
 		//Create shader programs
@@ -49,6 +52,11 @@
 		program_list["CN_TEXTURE_SIMPLE_SHADER_PROGRAM"] = cn_gl_create_shader_program(
 			cn_gl_get_shader("CN_TEXTURE_SIMPLE_FRAGMENT"),
 			cn_gl_get_shader("CN_TEXTURE_SIMPLE_VERTEX")
+		);
+
+		program_list["CN_PHONG_NO_TEXTURE_SHADER_PROGRAM"] = cn_gl_create_shader_program(
+			cn_gl_get_shader("CN_PHONG_NO_TEXTURE_FRAGMENT"),
+			cn_gl_get_shader("CN_PHONG_NO_TEXTURE_VERTEX")
 		);
 
 		//Create a camera
@@ -68,7 +76,7 @@
 		model_list["LEVEL_BOTTOM"] = new CN_MODEL("model/obj/gl_map_bottom.obj");
 
 		//Load railgun model
-		model_list["MDL_RAILGUN"] = new CN_MODEL("model/obj/rail.obj");
+		model_list["MDL_TEAPOT"] = new CN_MODEL("model/obj/teapot.obj");
 
 		//Create the map ground object
 		object_list.push(new CN_INSTANCE(
@@ -86,38 +94,72 @@
 			program_list["CN_TEXTURE_SIMPLE_SHADER_PROGRAM"]
 		));
 
-		//Create the railgun object
+		//Create the north teapot object
 		object_list.push(new CN_INSTANCE(
-			0, 0, 16,
-			model_list["MDL_RAILGUN"],
-			texture_list["TEX_RAILGUN"],
-			program_list["CN_TEXTURE_SIMPLE_SHADER_PROGRAM"]	
+			0, -64, 0,
+			model_list["MDL_TEAPOT"],
+			null,
+			program_list["CN_PHONG_NO_TEXTURE_SHADER_PROGRAM"]	
 		));
-		object_list[object_list.length - 1].set_scale(8, 8, 8);
+		object_list[object_list.length - 1].set_scale(16, 16, 16);
+		object_list[object_list.length - 1].set_rotation(90, 0, -90);
+
+		//Create the south teapot object
+		object_list.push(new CN_INSTANCE(
+			0, 64, 0,
+			model_list["MDL_TEAPOT"],
+			null,
+			program_list["CN_PHONG_NO_TEXTURE_SHADER_PROGRAM"]	
+		));
+		object_list[object_list.length - 1].set_scale(16, 16, 16);
+		object_list[object_list.length - 1].set_rotation(90, 0, 90);
+
+		//Create the west teapot object
+		object_list.push(new CN_INSTANCE(
+			-64, 0, 0,
+			model_list["MDL_TEAPOT"],
+			null,
+			program_list["CN_PHONG_NO_TEXTURE_SHADER_PROGRAM"]	
+		));
+		object_list[object_list.length - 1].set_scale(16, 16, 16);
+		object_list[object_list.length - 1].set_rotation(90, 0, 180);
+
+		//Create the east teapot object
+		object_list.push(new CN_INSTANCE(
+			64, 0, 0,
+			model_list["MDL_TEAPOT"],
+			null,
+			program_list["CN_PHONG_NO_TEXTURE_SHADER_PROGRAM"]	
+		));
+		object_list[object_list.length - 1].set_scale(16, 16, 16);
+		object_list[object_list.length - 1].set_rotation(90, 0, 0);
+
+		//Create the skybox object
+		var SKYBOX_OBJS = [
+			"model/obj/SKYBOX_CUBE/UX2_SKYBOX_FRONT.obj",
+			"model/obj/SKYBOX_CUBE/UX2_SKYBOX_BACK.obj",
+			"model/obj/SKYBOX_CUBE/UX2_SKYBOX_LEFT.obj",
+			"model/obj/SKYBOX_CUBE/UX2_SKYBOX_RIGHT.obj",
+			"model/obj/SKYBOX_CUBE/UX2_SKYBOX_TOP.obj",
+			"model/obj/SKYBOX_CUBE/UX2_SKYBOX_BOTTOM.obj"
+		];
+		var SKYBOX_TEXS = [
+			"texture/SKYBOX_CUBE/FRONT.png",
+			"texture/SKYBOX_CUBE/BACK.png",
+			"texture/SKYBOX_CUBE/LEFT.png",
+			"texture/SKYBOX_CUBE/RIGHT.png",
+			"texture/SKYBOX_CUBE/TOP.png",
+			"texture/SKYBOX_CUBE/BOTTOM.png"
+		];
+		SKYBOX_OBJ = new CN_CUBE_SKYBOX(SKYBOX_OBJS, SKYBOX_TEXS);
+		SKYBOX_OBJ.set_range(64.0);
+		SKYBOX_OBJ.bind_to_camera(camera);
 
 		//Start the draw event.
 		draw();
 	}
 
-	function draw() {
-		resize(gl.canvas);
-		gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-
-		//Clear the screen
-		gl.clear(gl.CLEAR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-		//Project the camera
-		camera.set_projection_ext(
-			Math.cos(angle) * 512, -Math.sin(angle) * 512, 184, //Camera position
-			0, 0, -128,                                         //Point to look at
-			0, 0,    1,                                         //Up Vector (always this)
-			75,                                                 //FOV
-			gl.canvas.clientWidth / gl.canvas.clientHeight,     //Aspect Ratio
-			1.0,                                                //Closest distance
-			4096.0                                              //Farthest distance
-		);
-		angle += 0.01;
-		
+	function render() {
 		//Draw every object
 		var prev_program = null;
 		for (var i = 0; i < object_list.length; i++) {
@@ -134,6 +176,42 @@
 			//Draw the object
 			object_list[i].draw();
 		}
+	}
+
+	function draw() {
+		resize(gl.canvas);
+		gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
+		//Clear the screen
+		gl.clear(gl.CLEAR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+		//Project the camera
+		camera.set_projection_ext(
+			Math.cos(angle) * 512, -Math.sin(angle) * 512, 184, //Camera position
+			0, 0, -184,                                         //Point to look at
+			0, 0,    1,                                         //Up Vector
+			75,                                                 //FOV
+			gl.canvas.clientWidth / gl.canvas.clientHeight,     //Aspect Ratio
+			1.0,                                                //Closest distance
+			16384.0                                             //Farthest distance
+		);
+		angle += 0.01;
+		//angle = 30 / 180 * Math.PI;
+		
+		//Draw the skybox
+		gl.useProgram(SKYBOX_OBJ.obj_array[0].program);
+		camera.push_matrix_to_shader(
+			SKYBOX_OBJ.obj_array[0].program,
+			"uPMatrix",
+			"uMVMatrix"
+		);
+		SKYBOX_OBJ.draw();
+
+		//Ensure that the skybox is always behind whatever else is drawn
+		gl.clear(gl.DEPTH_BUFFER_BIT);
+		
+		//Draw every object
+		render();
 		
 		//Request from the browser to draw again
 		window.requestAnimationFrame(draw);

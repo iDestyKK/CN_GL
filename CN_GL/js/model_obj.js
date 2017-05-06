@@ -30,9 +30,9 @@ function CN_MODEL(filepath) {
 	this.ver_normal           = Array();
 
 	//Buffers
-	this.vertex_buffer        = Array();
-	this.vertex_normal_buffer = Array();
-	this.texture_buffer       = Array();
+	this.vertex_buffer        = null;
+	this.vertex_normal_buffer = null;
+	this.texture_buffer       = null;
 
 	if (filepath != undefined) {
 		//Load information from an OBJ file and put it in the model
@@ -122,7 +122,6 @@ function parse_obj(obj, data) {
 	}
 
 	//Post-Processing Effects
-	//TODO: FIND OUT WHY THE VERTEX NORMALS AREN'T CALCULATED PROPERLY!!!
 	
 	//Clear out this array since it probably contains garbage (a lot of "NaN"s)
 	if (obj.normal.length == 0)
@@ -176,35 +175,45 @@ function parse_obj(obj, data) {
 		obj.ver_normal[i].y /= m;
 		obj.ver_normal[i].z /= m;
 	}
-
+	
 	//Create the vertex buffer
-	obj.vertex_buffer = Array();
+	var vert_buf = Array();
+	obj.vertex_buffer = gl.createBuffer();
 	for (var i = 0; i < obj.vertex_id.length; i++) {
-		obj.vertex_buffer.push(
+		vert_buf.push(
 			parseFloat(obj.vertex[(obj.vertex_id[i] * 3)    ]),
 			parseFloat(obj.vertex[(obj.vertex_id[i] * 3) + 1]),
 			parseFloat(obj.vertex[(obj.vertex_id[i] * 3) + 2])
 		);
 	}
+	gl.bindBuffer(gl.ARRAY_BUFFER, obj.vertex_buffer);
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vert_buf), gl.STATIC_DRAW);
 
 	//Create the vertex normal buffer
-	obj.vertex_normal_buffer = Array();
+	var norm_buf = Array();
+	obj.vertex_normal_buffer = gl.createBuffer();
 	for (var i = 0; i < obj.ver_normal.length; i++) {
-		obj.vertex_normal_buffer.push(
+		norm_buf.push(
 			obj.ver_normal[i].x,
 			obj.ver_normal[i].y,
 			obj.ver_normal[i].z
 		);
 	}
+	gl.bindBuffer(gl.ARRAY_BUFFER, obj.vertex_normal_buffer);
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(norm_buf), gl.STATIC_DRAW);
 
 	//Create the texture buffer.
-	obj.texture_buffer = Array();
+	var tex_buf = Array();
+	obj.texture_buffer = gl.createBuffer();
 	for (var i = 0; i < obj.texture_id.length; i++) {
-		obj.texture_buffer.push(
+		tex_buf.push(
 			obj.texture[ obj.texture_id[i] * 2     ],
 			obj.texture[(obj.texture_id[i] * 2) + 1]
 		);
 	}
+	gl.bindBuffer(gl.ARRAY_BUFFER, obj.texture_buffer);
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(tex_buf), gl.STATIC_DRAW);
+
 	
 	//This model is ready to be displayed.
 	obj.ready = true;
