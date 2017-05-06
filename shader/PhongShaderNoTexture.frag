@@ -9,6 +9,7 @@ varying vec4 norm;
 varying vec3 c_pos;
 varying mat4 matrix_MV;
 varying mat4 matrix_P;
+uniform mat4 inverseMV;
 varying lowp vec4 vert_colour;
 varying vec3 v_translate;
 
@@ -23,19 +24,20 @@ void main(void) {
 	const vec4 light_amb = vec4(1.0, 1.0, 1.0, 1.0);
 	const vec4 light_dif = vec4(1.0, 1.0, 1.0, 1.0);
 	const vec4 light_spe = vec4(1.0, 1.0, 1.0, 1.0);
+	
+	//Do Phong Calculations
+	vec3 light_pos = vec3(c_pos);
+	vec3 modelView_vertex = vec3(matrix_MV * vec4(vector_pos, 1.0));
+	vec3 modelView_normal = normalize(vec3(inverseMV * vec4(vec3(norm), 0.0)));
+	
+	vec3 L = normalize(light_pos - modelView_vertex);
+	vec3 E = normalize(-modelView_vertex);
+	vec3 R = normalize(-reflect(L, modelView_normal));
 
-	vec4 light_pos = vec4(c_pos, 1.0);
-	vec4 modelView_vertex = matrix_MV * vec4(vector_pos, 1.0);
-	vec4 modelView_normal = normalize(matrix_MV * vec4(vec3(norm), 0.0));
+	vec3 total_ambient  = ambient;
+	vec3 total_diffuse  = diffuse  * max(dot(modelView_normal, L), 0.0);
+	vec3 total_specular = specular * pow(max(dot(R, E), 0.0), shiny);
+	total_specular = clamp(total_specular, 0.0, 1.0);
 
-	vec4 view_angle = normalize(light_pos - modelView_vertex); //normalize(vec4(uMVMatrix * vec4(vPos, 1.0)));
-
-	vec4 light_vertex = normalize(vec4(light_pos - modelView_vertex));
-	vec4 reflect_vec  = normalize(reflect(-light_vertex, modelView_normal));
-
-	vec3 total_ambient  = ambient;//	* light_amb;
-	vec3 total_diffuse  = diffuse * max(dot(modelView_normal, light_vertex), 0.0);
-	vec3 total_specular = specular * pow(max(dot(reflect_vec, view_angle), 0.0), shiny);
-	 
-	gl_FragColor = vec4(total_ambient + total_diffuse + total_specular, 1.0); //+ total_specular;
+	gl_FragColor = vec4(total_ambient + total_diffuse + total_specular, 1.0);
 }

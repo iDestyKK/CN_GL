@@ -35,6 +35,15 @@ CN_CAMERA.prototype.push_matrix_to_shader = function(program, pname, mvname) {
 		false,
 		new Float32Array(this.lookat_matrix.flatten())
 	);
+
+	var mvInverseUniform = gl.getUniformLocation(program, "inverseMV");
+	if (mvInverseUniform != null) {
+		gl.uniformMatrix4fv(
+			mvInverseUniform,
+			false,
+			new Float32Array(this.lookat_matrix.inverse().transpose().flatten())
+		);
+	}
 }
 
 CN_CAMERA.prototype.draw = function() {

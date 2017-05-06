@@ -55,7 +55,7 @@ void main(void) {
 		0.0, 0.0, 0.0, 1.0
 	);
 	vec_real = vec3(vec4(vec_real, 1.0) * rotX * rotY * rotZ);
-	norm = norm * rotX * rotY * rotZ;
+	norm = vec4(normal, 1.0) * rotX * rotY * rotZ;
 
 	//Transform if possible
 	vec_real += transform;
