@@ -187,8 +187,8 @@
 
 		//Project the camera
 		camera.set_projection_ext(
-			Math.cos(angle) * 512, -Math.sin(angle) * 512, 184, //Camera position
-			0, 0, -184,                                         //Point to look at
+			Math.cos(angle) * 256, -Math.sin(angle) * 256, 46,  //Camera position
+			0, 0, -46,                                         //Point to look at
 			0, 0,    1,                                         //Up Vector
 			75,                                                 //FOV
 			gl.canvas.clientWidth / gl.canvas.clientHeight,     //Aspect Ratio
