@@ -80,6 +80,19 @@ CN_CAMERA.prototype.set_projection = function(xf, yf, zf, xt, yt, zt, xup, yup, 
 	);
 }
 
+function cn_gl_make_projection_ortho(l, r, b, t, znear, zfar) {
+	var tx = -(r + l) / (r - l),
+	    ty = -(t + b) / (t - b),
+	    tz = -(zfar + znear) / (zfar - znear);
+
+	return $M([
+		[2 / (r - l), 0          , 0                  , tx],
+		[0          , 2 / (t - b), 0                  , ty],
+		[0          , 0          , -2 / (zfar - znear), tz],
+		[0          , 0          , 0                  , 1 ]
+	]);
+}
+
 //Helper functions
 Matrix.prototype.flatten = function() {
 	var result = [];

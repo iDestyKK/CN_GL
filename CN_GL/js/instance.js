@@ -257,10 +257,75 @@ CN_INSTANCE.prototype.draw = function() {
 			]));
 		}
 
+		//Deal with shadows
+		var sampler_shadow_loc = gl.getUniformLocation(this.program, "sampler_shadow");
+		if (sampler_shadow_loc != null) {
+			gl.uniform1i(sampler_shadow_loc, 1);
+			gl.activeTexture(gl.TEXTURE1);
+			gl.bindTexture(gl.TEXTURE_2D, fboTex);
+
+			//Must also have lMBMatrix and lPMatrix!
+			lightPOV.push_matrix_to_shader(
+				this.program,
+				"lPMatrix",
+				"lMVMatrix"
+			);
+			gl.activeTexture(gl.TEXTURE0);
+		}
+
 		//gl.bindBuffer(gl.ARRAY_BUFFER, texture_buffer);
 		//gl.vertexAttribPointer(tex_coord_attr, 2, gl.FLOAT, false, 0, 0);
 		
 		gl.useProgram(this.program);
+		gl.drawArrays(gl.TRIANGLES, 0, this.model.vertex_id.length);
+	}
+}
+
+CN_INSTANCE.prototype.draw_just_triangles = function(program) {
+	if (this.model != undefined && this.model.ready == true) {
+		//Draw only if the instance has a model
+
+		//Deal with textures
+		var ver_pos_attr = gl.getAttribLocation(this.program, "vec_pos");
+
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.model.vertex_buffer);
+		gl.vertexAttribPointer(
+			ver_pos_attr,
+			3,
+			gl.FLOAT,
+			gl.FALSE,
+			0,
+			0
+		);
+		gl.enableVertexAttribArray(ver_pos_attr);
+		
+		if (program != undefined) {
+			//Deal with transformations
+			var transform_loc = gl.getUniformLocation(program, "transform");
+			if (transform_loc != null) {
+				//The shader "must" support transformations to do them!
+				gl.uniform3fv(transform_loc, new Float32Array([this.x, this.y, this.z]));
+			}
+			
+			//Deal with scaling
+			var scale_loc = gl.getUniformLocation(program, "scale");
+			if (scale_loc != null) {
+				//The shader "must" support scaling to do them!
+				gl.uniform3fv(scale_loc, new Float32Array([
+					this.xscale, this.yscale, this.zscale
+				]));
+			}
+
+			//Deal with rotating
+			var rotate_loc = gl.getUniformLocation(program, "rotate");
+			if (rotate_loc != null) {
+				//The shader "must" support rotating to do them!
+				gl.uniform3fv(rotate_loc, new Float32Array([
+					this.xrot, this.yrot, this.zrot
+				]));
+			}
+		}
+
 		gl.drawArrays(gl.TRIANGLES, 0, this.model.vertex_id.length);
 	}
 }

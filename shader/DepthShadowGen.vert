@@ -1,21 +1,15 @@
 precision mediump float;
 
 attribute vec3 vec_pos;
-attribute vec2 texcoord;
 
 uniform mat4 uMVMatrix;
 uniform mat4 uPMatrix;
 
-uniform mat4 lMVMatrix;
-uniform mat4 lPMatrix;
-
+varying float vDepth;
 
 uniform vec3 transform;
 uniform vec3 scale;
 uniform vec3 rotate;
-
-varying vec2 v_texcoord;
-varying vec3 v_light_pos;
 
 void main() {
 	//Scale if possible
@@ -55,13 +49,9 @@ void main() {
 
 	//Transform if possible
 	vec_real += transform;
-	v_texcoord = texcoord;
 
-	vec4 light_position = lMVMatrix * vec4(vec_real, 1.0);
-	light_position = lPMatrix * light_position;
-	vec3 light_position_dnc = light_position.xyz / light_position.w;
-	v_light_pos = vec3(0.5, 0.5, 0.5) + light_position_dnc * 0.5;
-
-
-	gl_Position = uPMatrix * uMVMatrix * vec4(vec_real, 1.0);
+	vec4 position = uPMatrix * uMVMatrix * vec4(vec_real, 1.0);
+	float zBuf = position.z / position.w; //Z-buffer between -1 and 1
+	vDepth = 0.5 + zBuf * 0.5; //Between 0 and 1
+	gl_Position = position;
 }

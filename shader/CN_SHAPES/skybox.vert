@@ -5,17 +5,11 @@ attribute vec2 texcoord;
 
 uniform mat4 uMVMatrix;
 uniform mat4 uPMatrix;
-
-uniform mat4 lMVMatrix;
-uniform mat4 lPMatrix;
-
-
 uniform vec3 transform;
 uniform vec3 scale;
 uniform vec3 rotate;
 
 varying vec2 v_texcoord;
-varying vec3 v_light_pos;
 
 void main() {
 	//Scale if possible
@@ -56,12 +50,6 @@ void main() {
 	//Transform if possible
 	vec_real += transform;
 	v_texcoord = texcoord;
-
-	vec4 light_position = lMVMatrix * vec4(vec_real, 1.0);
-	light_position = lPMatrix * light_position;
-	vec3 light_position_dnc = light_position.xyz / light_position.w;
-	v_light_pos = vec3(0.5, 0.5, 0.5) + light_position_dnc * 0.5;
-
 
 	gl_Position = uPMatrix * uMVMatrix * vec4(vec_real, 1.0);
 }

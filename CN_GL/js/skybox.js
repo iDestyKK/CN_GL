@@ -35,7 +35,7 @@ function CN_CUBE_SKYBOX(OBJ_ARRAY, TEX_ARRAY) {
 				0, 0, 0,
 				this.mdl_array[i],
 				this.tex_array[i],
-				program_list["CN_TEXTURE_SIMPLE_SHADER_PROGRAM"]
+				program_list["CN_SKYBOX_SHADER_PROGRAM"]
 			));
 		}
 	}
