@@ -162,3 +162,67 @@ function cn_gl_ortho_draw_texture(tex, x, y, width, height) {
 
 	gl.drawArrays(gl.TRIANGLES, 0, 6);
 }
+
+function cn_gl_ortho_draw_texture_loose(tex, x, y, width, height) {
+	gl.bindTexture(gl.TEXTURE_2D, tex);
+
+	var x1 = x, y1 = y, x2 = x + width, y2 = y + height;
+	//Create Buffers
+	var vertices_buffer = [
+		x1, y1,
+		x2, y1,
+		x2, y2,
+
+		x2, y2,
+		x1, y2,
+		x1, y1
+	];
+
+	var texture_buffer = [
+		0, 0,
+		1, 0,
+		1, 1,
+
+		1, 1,
+		0, 1,
+		0, 0
+	];
+	
+	//Pass the buffers into the GL shaders
+	var triangle_buffer_object = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, triangle_buffer_object);
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices_buffer), gl.STATIC_DRAW);
+
+	var position_attrib_location = gl.getAttribLocation(
+		program_list["CN_ORTHO_TEXTURE_SHADER_PROGRAM"],
+		"position"
+	);
+	gl.vertexAttribPointer(
+		position_attrib_location,
+		2,
+		gl.FLOAT,
+		gl.FALSE,
+		2 * Float32Array.BYTES_PER_ELEMENT,
+		0
+	);
+	gl.enableVertexAttribArray(position_attrib_location);
+	
+	var tex_buffer_object = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, tex_buffer_object);
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(texture_buffer), gl.STATIC_DRAW);
+	var tex_attrib_location = gl.getAttribLocation(
+		program_list["CN_ORTHO_TEXTURE_SHADER_PROGRAM"],
+		"texcoord"
+	);
+	gl.vertexAttribPointer(
+		tex_attrib_location,
+		2,
+		gl.FLOAT,
+		gl.FALSE,
+		2 * Float32Array.BYTES_PER_ELEMENT,
+		0
+	);
+	gl.enableVertexAttribArray(tex_attrib_location);
+
+	gl.drawArrays(gl.TRIANGLES, 0, 6);
+}
