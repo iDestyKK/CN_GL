@@ -259,7 +259,7 @@ CN_INSTANCE.prototype.draw = function() {
 
 		//Deal with shadows
 		var sampler_shadow_loc = gl.getUniformLocation(this.program, "sampler_shadow");
-		if (sampler_shadow_loc != null) {
+		if (sampler_shadow_loc != null && typeof fboTex !== 'undefined') {
 			gl.uniform1i(sampler_shadow_loc, 1);
 			gl.activeTexture(gl.TEXTURE1);
 			gl.bindTexture(gl.TEXTURE_2D, fboTex);

@@ -167,8 +167,8 @@ function parse_obj(obj, data) {
 	//Normalise every vertex
 	for (var i = 0; i < obj.ver_normal.length; i++) {
 		var m = Math.sqrt(
-			Math.pow(obj.ver_normal[i].x, 2),
-			Math.pow(obj.ver_normal[i].y, 2),
+			Math.pow(obj.ver_normal[i].x, 2) +
+			Math.pow(obj.ver_normal[i].y, 2) +
 			Math.pow(obj.ver_normal[i].z, 2)
 		);
 		obj.ver_normal[i].x /= m;
@@ -239,11 +239,11 @@ function cn_gl_calculate_normal(modelID, a, b, c) {
 	}
 
 	//Normalise
-	//var m = Math.sqrt(Math.pow(r.x, 2) + Math.pow(r.y, 2) + Math.pow(r.z, 2));
+	var m = Math.sqrt(Math.pow(r.x, 2) + Math.pow(r.y, 2) + Math.pow(r.z, 2));
 
-	//r.x /= m;
-	//r.y /= m;
-	//r.z /= m;
+	r.x /= m;
+	r.y /= m;
+	r.z /= m;
 
 	return r;
 }
