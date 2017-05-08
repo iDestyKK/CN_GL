@@ -1,0 +1,56 @@
+<html>
+	<head>
+		<title>Details on the final project</title>
+	</head>
+	<body>
+		<h1>CN_GL - FPS Example (CS456 Final Project)</h1>
+		<h2>Shaders</h2>
+		<ol>
+			<li><b>Real Time Dynamic Water Reflections</b> - The scene renders the entire world in reverse, cuts off all drawing (in the reflected world) under the water height, and then assigns that to a framebuffer. Then, in the fragment shader, the tex coordinates are convered into screen coordinates and drawn onto the screen only where the water is. There are no ripples (yet). This is a perfect reflection. It should be noted that you can see through the water since it is drawn with transparency. This demonstrates WebGL's blending modes.</li>
+			<li><b>Real Time Dynamic Shadows</b> - The scene renders the entire world in perspective projection from the light source, creates a depth map, and then uses that to tell whether or not a point in 3D space is supposed to be shaded. If it is, all lighting is disabled on that pixel and instead, it takes that pixel and multiples its RGB values by 0.5 and draws that. It lacks anti-aliasing, so it does look jagged on the edges.</li>
+			<li><b>Phong Shading</b> - Somewhat inaccurate, but gets the job done. Light dynamically interacts with the environment to light up parts that it should be reflecting off of.</li>
+			<li><b>Specular Lighting</b> - Subtracts from the texture and then multiplies back to simulate a "Levels" effect to get only the brightest colours out. Then, Phong shading only affects those pixels as opposed to the darker coloured ones.</li>
+			<li><b>2 Pass Fast Blur</b> - Two pass fake Gaussian Blur via shaders. The first pass comes from rendering the entire scene. The fragment shader will blur it on the X axis only. Afterwards, that one is drawn to the next framebuffer, where the second fragment shader will blur it on the Y Axis. It is then drawn to the screen using GL Blending. This is the last step in the drawing process.</li>
+		</ol>
+		<h2>Objects/Effects</h2>
+		<ol>
+			<li><b>Mario Cube x3</b> - The only logical excuse to have a cube flying in the air. Made it spin to show basic animations off.
+				<ul>
+					<li>Includes Phong Shading w/ Texture</li>
+					<li>Affected by Shadows</li>
+				</ul>
+			</li>
+			<li><b>Teapot</b> - It's cute, so I added it and <i>I hid it in the map</i>. Try to find it <u>without cheating</u>. :)
+				<ul>
+					<li>Includes Phong Shading w/ No Texture</li>
+					<li>Affected by Shadows</li>
+				</ul>
+			</li>
+			<li><b>Railgun</b> - Straight from Quake. Again, try finding this one. And then try picking it up. :) (Spoilers in the next section)
+				<ul>
+					<li>Affected by Shadows</li>
+				</ul>
+			</li>
+			<li><b>UX2 Map</b> - This shouldn't really be counting as an object, but the world is split up into the 3 materials that make it.
+				<ul>
+					<li><b>Sand</b> - Phong Shading</li>
+					<li><b>Metal</b> - Phong Shading</li>
+					<li><b>Brick</b> - (Awkwardly) Phong Shading</li>
+					<li>All of which are affected by Shadows</li>
+				</ul>
+			</li>
+			<li><b>Water</b> - Not trying to double dip here, but the water is actually loaded from an OBJ file that has a 1x1x0 plane. This plane is then set to cast the reflected world on.
+				<ul>
+					<li>Affected by Shadows</li>
+					<li>Casts dynamic reflection of the world</li>
+				</ul>
+			</li>
+		</ol>
+		<h2>Other Features</h2>
+		<ol>
+			<li><b>Completely rewritten engine from scratch</b> - Based off of my DERPG UX2 Engine I wrote back in 2013, CN_GL is a WebGL engine made in under 96 hours to conquer a homework assignment and also allow me to write WebGL applications in the near future much more easily than without it.</li>
+			<li><b>FPS-like control scheme</b> - WASD to move, captures the mouse (Chrome and Firefox only) to allow you to look around with it without actually moving the cursor. Shoot Railgun with left mouse click.</li>
+			<li><b>Dynamically Resizable Window</b> - Resize the window! Go on, I dare you. It won't change how the game performs.</li>
+		</ol>
+	</body>
+</html>

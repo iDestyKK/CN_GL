@@ -26,9 +26,9 @@ void main() {
 	
 	//Level out the colours.
 	float yes = 
-		((sum.r - 0.40) * 4.4285) +
-		((sum.g - 0.40) * 4.4285) +
-		((sum.b - 0.40) * 4.4285);
+		((sum.r - 0.70) * 4.4285) +
+		((sum.g - 0.70) * 4.4285) +
+		((sum.b - 0.70) * 4.4285);
 	yes /= 3.0;
 
 	vec4 col = vec4(

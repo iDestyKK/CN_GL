@@ -12,8 +12,16 @@ varying mat4 matrix_P;
 uniform mat4 inverseMV;
 varying lowp vec4 vert_colour;
 varying vec3 v_translate;
+uniform vec4 water_height;
+
+uniform sampler2D sampler_shadow;
+varying vec3 v_light_pos;
 
 void main(void) {
+	//Water checking.
+	if (water_height.w == 1.0 && vector_pos.z < water_height.z)
+		discard;
+
 	//Polished Gold
 	const vec3 ambient   = vec3(0.329412, 0.223529, 0.027451);
 	const vec3 diffuse   = vec3(0.780392, 0.568627, 0.113725);
@@ -30,7 +38,7 @@ void main(void) {
 	vec3 modelView_vertex = vec3(matrix_MV * vec4(vector_pos, 1.0));
 	vec3 modelView_normal = normalize(vec3(inverseMV * vec4(vec3(norm), 0.0)));
 	
-	vec3 L = normalize(light_pos - modelView_vertex);
+	vec3 L = normalize(v_light_pos - modelView_vertex);
 	vec3 E = normalize(-modelView_vertex);
 	vec3 R = normalize(-reflect(L, modelView_normal));
 
@@ -39,5 +47,22 @@ void main(void) {
 	vec3 total_specular = specular * pow(max(dot(R, E), 0.0), shiny);
 	total_specular = clamp(total_specular, 0.0, 1.0);
 
-	gl_FragColor = vec4(total_ambient + total_diffuse + total_specular, 1.0);
+	//Now do shadows
+	vec2 uv_shadow_map = v_light_pos.xy;
+	vec4 shadow_map_color = texture2D(sampler_shadow, uv_shadow_map);
+	float z_shadow_map = shadow_map_color.r;
+	float shadow_coeff = 1.0 - (smoothstep(0.0021, 0.003, v_light_pos.z - z_shadow_map) * 0.75);
+
+	if (shadow_coeff != 1.0) {
+		vec4 tex_col = vec4(total_ambient + total_diffuse, 1.0);
+		vec4 tmp_col = vec4(
+			tex_col.r * shadow_coeff,
+			tex_col.g * shadow_coeff,
+			tex_col.b * shadow_coeff,
+			tex_col.a
+		);
+		gl_FragColor = tmp_col;
+	}
+	else
+		gl_FragColor = vec4(total_ambient + total_diffuse + total_specular, 1.0);
 }

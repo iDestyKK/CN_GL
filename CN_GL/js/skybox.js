@@ -51,6 +51,12 @@ CN_CUBE_SKYBOX.prototype.set_range = function(val) {
 	}
 }
 
+CN_CUBE_SKYBOX.prototype.set_rotation = function(x, y, z) {
+	for (var i = 0; i < this.obj_array.length; i++) {
+		this.obj_array[i].set_rotation(x, y, z);
+	}
+}
+
 CN_CUBE_SKYBOX.prototype.draw = function() {
 	if (this.camera != null) {
 		for (var i = 0; i < this.obj_array.length; i++) {

@@ -12,6 +12,7 @@ varying mat4 matrix_P;
 uniform mat4 inverseMV;
 varying lowp vec4 vert_colour;
 varying vec3 v_translate;
+uniform vec4 water_height;
 
 //Regular Texture Information
 uniform sampler2D u_texture;
@@ -23,6 +24,10 @@ varying vec3 v_light_pos;
 
 
 void main(void) {
+	//Water checking.
+	if (water_height.w == 1.0 && vector_pos.z < water_height.z)
+		discard;
+
 	//Polished Gold
 	const vec3 ambient   = vec3(0.0, 0.0, 0.0);//vec3(0.329412, 0.223529, 0.027451);
 	const vec3 diffuse   = vec3(0.35, 0.27, 0.15); //vec3(0.780392, 0.568627, 0.113725);

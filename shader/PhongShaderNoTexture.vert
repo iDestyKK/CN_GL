@@ -7,6 +7,9 @@ varying mat4 matrix_MV;
 varying mat4 matrix_P;
 varying vec3 v_translate;
 
+uniform mat4 lMVMatrix;
+uniform mat4 lPMatrix;
+
 attribute vec3 normal;
 uniform vec3 camera_pos;
 uniform mat4 uMVMatrix;//modelviewmatrix
@@ -15,6 +18,8 @@ uniform mat4 uPMatrix;//projectionmatrix
 uniform vec3 transform;
 uniform vec3 scale;
 uniform vec3 rotate;
+
+varying vec3 v_light_pos;
 
 void main(void) {
 	norm = vec4(normal, 1.0);
@@ -62,6 +67,11 @@ void main(void) {
 
 	//Pass on to fragment shader
 	vector_pos = vec_real;
+
+	vec4 light_position = lMVMatrix * vec4(vec_real, 1.0);
+	light_position = lPMatrix * light_position;
+	vec3 light_position_dnc = light_position.xyz / light_position.w;
+	v_light_pos = vec3(0.5, 0.5, 0.5) + light_position_dnc * 0.5;
 
 	//Yes
 	matrix_MV = uMVMatrix;

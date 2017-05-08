@@ -232,6 +232,12 @@ CN_INSTANCE.prototype.draw = function() {
 			}
 		}
 
+		//Deal with the possibility of water shaders
+		var water_height_loc = gl.getUniformLocation(this.program, "water_height");
+		if (water_height_loc != null) {
+			gl.uniform4fv(water_height_loc, new Float32Array(water_array));
+		}
+
 		//Deal with transformations
 		var transform_loc = gl.getUniformLocation(this.program, "transform");
 		if (transform_loc != -1) {
